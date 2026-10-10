@@ -73,38 +73,50 @@ class RAGPipeline:
         )
 
     def resolve_question(self, question: str, chat_history: Optional[List[BaseMessage]] = None) -> str:
-        """If there is a conversation history, rewrite it into a standalone question for vector search."""
+        """Nếu có lịch sử trò chuyện, viết lại thành câu hỏi độc lập để search vector."""
         if chat_history and len(chat_history) > 0:
             try:
-                return self.contextualize_chain.invoke({
+                res = self.contextualize_chain.invoke({
                     "chat_history": chat_history,
                     "question": question
                 })
+                # Bắt buộc chuyển sang primitive str để Google GenAI SDK serialize đúng
+                return str(res).strip() if res else str(question).strip()
             except Exception:
-                return question
-        return question
+                return str(question).strip()
+        return str(question).strip()
 
     async def aresolve_question(self, question: str, chat_history: Optional[List[BaseMessage]] = None) -> str:
-        """Asynchronously rewrite the question to make it self-contained."""
+        """Async viết lại câu hỏi độc lập."""
         if chat_history and len(chat_history) > 0:
             try:
-                return await self.contextualize_chain.ainvoke({
+                res = await self.contextualize_chain.ainvoke({
                     "chat_history": chat_history,
                     "question": question
                 })
+                # Bắt buộc chuyển sang primitive str để Google GenAI SDK serialize đúng
+                return str(res).strip() if res else str(question).strip()
             except Exception:
-                return question
-        return question
+                return str(question).strip()
+        return str(question).strip()
 
     def get_relevant_documents(self, question: str, chat_history: Optional[List[BaseMessage]] = None) -> List[Document]:
-        """Retrieve relevant documents from the vector store."""
-        search_query = self.resolve_question(question, chat_history)
-        return self.retriever.invoke(search_query)
+        """Truy xuất các tài liệu phù hợp từ vector store."""
+        search_query = str(self.resolve_question(question, chat_history)).strip()
+        try:
+            return self.retriever.invoke(search_query)
+        except Exception:
+            # Fallback với câu hỏi gốc dạng primitive str
+            return self.retriever.invoke(str(question).strip())
 
     async def aget_relevant_documents(self, question: str, chat_history: Optional[List[BaseMessage]] = None) -> List[Document]:
-        """Asynchronously retrieve documents from the vector store."""
-        search_query = await self.aresolve_question(question, chat_history)
-        return await self.retriever.ainvoke(search_query)
+        """Async truy xuất tài liệu từ vector store."""
+        search_query = str(await self.aresolve_question(question, chat_history)).strip()
+        try:
+            return await self.retriever.ainvoke(search_query)
+        except Exception:
+            # Fallback với câu hỏi gốc dạng primitive str
+            return await self.retriever.ainvoke(str(question).strip())
 
     def invoke(self, input_data: Any) -> Dict[str, Any]:
         """Execute synchronous RAG (returns the complete result)."""

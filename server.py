@@ -129,6 +129,7 @@ def ping():
     index_exists = os.path.exists(os.path.join(FAISS_INDEX_PATH, "index.faiss"))
     return {
         "status": "healthy",
+        "ping": "pong",
         "index_ready": index_exists
     }
 
