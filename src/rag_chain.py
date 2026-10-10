@@ -48,8 +48,7 @@ class RAGPipeline:
         )
         self.llm = ChatGoogleGenerativeAI(
             model=LLM_MODEL,
-            google_api_key=GOOGLE_API_KEY,
-            temperature=0.2
+            google_api_key=GOOGLE_API_KEY
         )
 
         # Contextualize question prompt & chain

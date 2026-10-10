@@ -38,8 +38,6 @@ chroma/
 *.faiss
 *.pkl
 
-data/
-
 *.log
 logs/
 *.tmp
