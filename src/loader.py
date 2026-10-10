@@ -24,7 +24,6 @@ def load_and_split_documents(data_path: str = "./data") -> List[Document]:
         data_path,
         glob="**/*.pdf",
         loader_cls=DEFAULT_LOADER,
-        show_progress=True
     )
     documents = loader.load()
     if not documents:

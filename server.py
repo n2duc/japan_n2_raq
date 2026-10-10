@@ -119,12 +119,13 @@ def root():
             "chat_sync": "POST /api/chat",
             "chat_stream": "POST /api/chat/stream",
             "rebuild_index": "POST /api/index/rebuild",
-            "health": "GET /health"
+            "ping": "GET /ping"
         }
     }
 
+@app.get("/ping")
 @app.get("/health")
-def health_check():
+def ping():
     index_exists = os.path.exists(os.path.join(FAISS_INDEX_PATH, "index.faiss"))
     return {
         "status": "healthy",
