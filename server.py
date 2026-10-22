@@ -13,6 +13,7 @@ from src.loader import load_and_split_documents
 from src.vector_db import build_vector_store, load_vector_store
 from src.rag_chain import create_rag_chain, RAGPipeline
 from src.config import FAISS_INDEX_PATH, LLM_MODEL, EMBEDDING_MODEL
+from src.exam_import.router import router as exam_import_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -64,6 +65,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(exam_import_router)
 
 # Models
 class ChatMessage(BaseModel):
@@ -119,6 +122,7 @@ def root():
             "chat_sync": "POST /api/chat",
             "chat_stream": "POST /api/chat/stream",
             "rebuild_index": "POST /api/index/rebuild",
+            "exam_import": "POST /api/exams/import",
             "ping": "GET /ping"
         }
     }
